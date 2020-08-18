@@ -8471,4 +8471,3 @@ var statesData = {
        }
     ]
  }
-}
