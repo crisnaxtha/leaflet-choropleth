@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Leaflet-Choropleth</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 400px;
+		}
+	</style>
+
+	<style>#map { width: 1200px; height: 500px; }
+.info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; } .info h4 { margin: 0 0 5px; color: #777; }
+.legend { text-align: left; line-height: 18px; color: #555; } .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }</style>
+</head>
+<body>
+
+<div id='map'></div>
+
+<script type="text/javascript" src="europe-geo-json.js"></script>
+
+<script type="text/javascript">
+
+    var map = L.map('map').setView([37.8, -96], 2);
+
+
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: '',
+		id: 'mapbox/light-v9',
+		tileSize: 512,
+		zoomOffset: -1
+    }).addTo(map);
+    
+    L.marker([31.415, 35.081]).addTo(map).bindPopup("<b>Israel </b><br />");
+    L.marker([8.381, -11.886]).addTo(map).bindPopup("<b>Sierra Leone </b><br />");
+    L.marker([7.428, 12.305]).addTo(map).bindPopup("<b>Cameroon</b><br />");
+    L.marker([16.012, -24.014]).addTo(map).bindPopup("<b>Cape Verde</b><br />");
+    L.marker([9.004, 8.679]).addTo(map).bindPopup("<b>Nigeria </b><br />");
+    L.marker([-17.6874, -149.3728]).addTo(map).bindPopup("<b>Tahiti</b><br />");
+    L.marker([-0.1865921,-78.7107506]).addTo(map).bindPopup("<b>Ecuador </b><br />");
+    L.marker([41.104, -97.734]).addTo(map).bindPopup("<b>USA</b><br />");
+
+	// control that shows state info on hover
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		this._div.innerHTML = '<h4>Logoplast</h4>' +  (props ?
+			'<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
+			: 'Hover over a state');
+	};
+
+	info.addTo(map);
+
+
+	// get color depending on population density value
+	function getColor() {
+		return '#367eaf';
+	}
+
+	function style(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			fillColor: getColor()
+		};
+	}
+
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 5,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info.update(layer.feature.properties);
+	}
+
+	var geojson;
+
+	function resetHighlight(e) {
+		geojson.resetStyle(e.target);
+		info.update();
+	}
+
+	function zoomToFeature(e) {
+        // map.fitBounds(e.target.getBounds());
+ 
+        map.setView(e.latlng, 3);
+
+        L.marker([46.154, 14.986]).addTo(map).bindPopup("<b>Slovenia </b><br />");
+        L.marker([44.063, 20.910]).addTo(map).bindPopup("<b>Serbia </b><br />");
+        L.marker([45.2401104,15.8242455]).addTo(map).bindPopup("<b>Croatia</b><br />");
+        L.marker([52.3545828,4.7638757]).addTo(map).bindPopup("<b>Holland</b><br />");
+        L.marker([40.4378698, -3.8196237]).addTo(map).bindPopup("<b>Spain </b><br />");
+        L.marker([35.9458, 14.3784]).addTo(map).bindPopup("<b>Malta</b><br />");
+        L.marker([39.493442,-8.2285567]).addTo(map).bindPopup("<b>Portugal </b><br />");
+        L.marker([53.486, -8.336]).addTo(map).bindPopup("<b>Ireland</b><br />");
+        L.marker([61.712882,9.5690583]).addTo(map).bindPopup("<b>Norway </b><br />");
+        L.marker([52.5065132,13.1445449]).addTo(map).bindPopup("<b>Germany </b><br />");
+        L.marker([48.869227,2.3251706]).addTo(map).bindPopup("<b>France</b><br />");
+        L.marker([39.056704,22.2264323]).addTo(map).bindPopup("<b>Greece</b><br />");
+        L.marker([50.8467316,4.3502251]).addTo(map).bindPopup("<b>Belgium </b><br />");
+        L.marker([49.771395,6.0540793]).addTo(map).bindPopup("<b>Luxembourg</b><br />");
+        L.marker([41.9097305,12.2558023]).addTo(map).bindPopup("<b>Italy </b><br />");
+	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+
+	geojson = L.geoJson(statesData, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('&copy; LogoPlast');
+
+</script>
+
+
+
+</body>
+</html>
